@@ -1,13 +1,3 @@
-require"funcs"
-function love.keypressed(key, scancode, isrepeat)
-    
+local Funcs = require("scripts.funcs")
+local Player = require("scripts.player")
 
-    if key == "escape" then
-	love.event.quit()
-    end
-    -- Movement
-    if key == "w" then
-
-    end
-  
-end
