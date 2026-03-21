@@ -15,6 +15,7 @@ scaleX = realW / VIRTUAL_W
 scaleY = realH / VIRTUAL_H
 
 local scale = math.min(scaleX, scaleY)
+
 scaleX = scale
 scaleY = scale
 
@@ -26,12 +27,24 @@ function love.load()
 	player = {}
 	player.x = VIRTUAL_W / 2
 	player.y = VIRTUAL_H / 2 + VIRTUAL_H / 10
-	player.size = 20
-	player.Nsize = 20
+	player.speed = 3
+	player.height = -80
+	player.width = 40
+
+	player.isDashing = false
+	player.dashCooldown = 60
+	player.dashTimer = 0
+
+	player.Nheight = player.height
 	player.state = 1
 	-- 1 = Standing
 	-- 2 = Crouching
 	-- 3 = Jumping
+
+	love.mouse.setVisible(false)
+
+	-- Sounds
+	dashSound = love.audio.newSource("assets/sounds/dash.wav", "static")
 end
 
 function love.draw()
@@ -41,29 +54,65 @@ function love.draw()
 
 	-- Graficos
 	love.graphics.setColor(1, 0, 1)
-	drawChar(1, player.x, player.y, player.size)
+	drawChar(1, player.x, player.y, player.width, player.height)
 
 	love.graphics.pop()
 end
 
 function love.update(dt)
+	if player.x >= VIRTUAL_W - player.width then
+		print(player.x)
+		player.x = VIRTUAL_W - player.width
+	elseif player.x <= 0 then
+		print(player.x)
+		player.x = 0
+	end
 
-	player.size = player.Nsize
+	-- Reset Vars
+	if player.state == 2 then
+		player.height = player.Nheight
+	end
+	if player.isDashing then
+		player.dashTimer = player.dashTimer + 2
+		print(player.dashTimer)
+		if player.dashTimer >= 45 then
+			player.isDashing = false
+			player.dashTimer = 0
+			player.dashCooldown = 120
+		end
+	else
+		player.dashCooldown = player.dashCooldown - 1
+	end
+
+	-- Movement
 	if love.keyboard.isDown("a") and player.state == 1 then
-		player.x = player.x - 2
+		if love.keyboard.isDown("space") and player.isDashing == false then
+			player.x = player.x - player.speed * 40
+			player.isDashing = true
+
+			dashSound:play()
+		else
+			player.x = player.x - player.speed
+		end
 	end
 	if love.keyboard.isDown("d") and player.state == 1 then
-		player.x = player.x + 2
-	end
+		if love.keyboard.isDown("space") and player.isDashing == false then
+			player.x = player.x + player.speed * 40
+			player.isDashing = true
 
+			dashSound:play()
+		else
+			player.x = player.x + player.speed
+		end
+	end
 	if love.keyboard.isDown("s") then
 		player.state = 2
 	else
 		player.state = 1
 	end
 
+	-- Check State
 	if player.state == 2 then
-		player.size = player.size - 2
+		player.height = player.height + 10
 	end
-
 end
