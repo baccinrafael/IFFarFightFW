@@ -26,10 +26,10 @@ offsetY = (realH - VIRTUAL_H * scale) / 2
 function love.load()
 	player = {}
 	player.x = VIRTUAL_W / 2
-	player.y = VIRTUAL_H / 2 + VIRTUAL_H / 10
+	player.y = VIRTUAL_H / 1.3
 	player.speed = 3
-	player.height = -80
-	player.width = 40
+	player.height = -160
+	player.width = 50
 
 	player.isDashing = false
 	player.dashCooldown = 60
@@ -45,6 +45,9 @@ function love.load()
 
 	-- Sounds
 	dashSound = love.audio.newSource("assets/sounds/dash.wav", "static")
+
+	-- Assets
+	backgroundImg = love.graphics.newImage("assets/wallpaper.jpg")
 end
 
 function love.draw()
@@ -53,18 +56,20 @@ function love.draw()
 	love.graphics.scale(scaleX, scaleY)
 
 	-- Graficos
-	love.graphics.setColor(1, 0, 1)
+	love.graphics.setColor(1, 1, 1, 0.5)
+	love.graphics.draw(backgroundImg) 
+
+	love.graphics.setColor(1, 1, 1, 1)
 	drawChar(1, player.x, player.y, player.width, player.height)
 
 	love.graphics.pop()
+
 end
 
 function love.update(dt)
 	if player.x >= VIRTUAL_W - player.width then
-		print(player.x)
 		player.x = VIRTUAL_W - player.width
 	elseif player.x <= 0 then
-		print(player.x)
 		player.x = 0
 	end
 
@@ -74,7 +79,6 @@ function love.update(dt)
 	end
 	if player.isDashing then
 		player.dashTimer = player.dashTimer + 2
-		print(player.dashTimer)
 		if player.dashTimer >= 45 then
 			player.isDashing = false
 			player.dashTimer = 0
@@ -115,4 +119,8 @@ function love.update(dt)
 	if player.state == 2 then
 		player.height = player.height + 10
 	end
+
+	-- if love.keyboard.isDown("y") then
+
+	-- end
 end
